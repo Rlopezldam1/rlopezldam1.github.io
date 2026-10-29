@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Canción en PlayHook</title>
+  <meta name="description" content="Una canción compartida desde PlayHook. Escúchala o guárdala en tus playlists.">
+  <meta property="og:title" content="Una canción compartida desde PlayHook">
+  <meta property="og:description" content="Escúchala o guárdala en tus playlists con PlayHook.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62.5..100,400..800&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg: #f2f2f0; --text: #000000; --muted: #6e6e6a; --accent: #2b3cf0; --on-accent: #ffffff; --line: #dcdcd7; --tile: #e4e4e0; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #000000; --text: #f2f2f0; --muted: #8f8f8a; --accent: #8f98ff; --on-accent: #000000; --line: #2a2a2a; --tile: #161616; }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font: 17px/1.55 "Archivo", system-ui, sans-serif; }
+    main { max-width: 520px; margin: 0 auto; padding: 32px 16px 48px; min-height: 100vh; display: flex; flex-direction: column; }
+    .brand { font-stretch: 62.5%; font-weight: 800; font-size: 1.5rem; color: var(--text); text-decoration: none; }
+    .cover { width: 100%; aspect-ratio: 1; border-radius: 10px; background: var(--tile) center/cover no-repeat; margin: 28px 0 24px; box-shadow: 0 18px 40px rgba(0,0,0,.25); }
+    h1 { font-stretch: 62.5%; font-weight: 800; font-size: clamp(2.4rem, 10vw, 3.4rem); line-height: 1; margin: 0 0 8px; overflow-wrap: anywhere; }
+    .artist { font-size: 1.25rem; font-weight: 500; margin: 0 0 24px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 28px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 12px 22px; border-radius: 999px; font: 600 1rem "Archivo", system-ui, sans-serif; text-decoration: none; cursor: pointer; border: 0; }
+    .primary { background: var(--accent); color: var(--on-accent); flex: 1 1 100%; }
+    .secondary { background: var(--text); color: var(--bg); flex: 1 1 auto; }
+    .label { font-size: .9rem; font-weight: 600; color: var(--muted); margin: 0 0 10px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip { min-height: 44px; display: inline-flex; align-items: center; padding: 10px 16px; border-radius: 999px; border: 1.2px solid var(--line); color: var(--text); text-decoration: none; font-weight: 600; font-size: .95rem; }
+    footer { margin-top: auto; padding-top: 48px; color: var(--muted); font-size: .9rem; }
+    footer a { color: var(--text); }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+<main>
+  <a class="brand" href="/">PlayHook</a>
+  <div class="cover" id="cover" role="img" aria-label="Portada"></div>
+  <h1 id="title">Canción</h1>
+  <p class="artist" id="artist"></p>
+  <div class="actions">
+    <a class="btn primary" id="open">Abrir en PlayHook</a>
+    <button class="btn secondary hidden" id="play" type="button">▶ Escuchar 30 s</button>
+  </div>
+  <p class="label">Escúchala en</p>
+  <div class="chips">
+    <a class="chip" id="spotify" target="_blank" rel="noopener">Spotify</a>
+    <a class="chip" id="ytmusic" target="_blank" rel="noopener">YouTube Music</a>
+    <a class="chip" id="apple" target="_blank" rel="noopener">Apple Music</a>
+    <a class="chip hidden" id="deezer" target="_blank" rel="noopener">Deezer</a>
+  </div>
+  <footer>Compartida con <a href="/">PlayHook</a>, la app que te dice qué canción suena en un vídeo.</footer>
+</main>
+<audio id="audio" preload="none"></audio>
+<script>
+  const STORE = 'https://play.google.com/store/apps/details?id=com.playhook.app';
+  const params = new URLSearchParams(location.search);
+  const song = { dz: params.get('dz'), sp: params.get('sp'), title: params.get('t') || '', artist: params.get('a') || '' };
+  const $ = (id) => document.getElementById(id);
+
+  function render() {
+    if (song.title) {
+      $('title').textContent = song.title;
+      document.title = song.title + ' – ' + song.artist + ' · PlayHook';
+    }
+    $('artist').textContent = song.artist;
+    if (song.cover) $('cover').style.backgroundImage = 'url("' + song.cover.replace(/"/g, '') + '")';
+
+    const q = encodeURIComponent((song.title + ' ' + song.artist).trim());
+    $('spotify').href = song.sp ? 'https://open.spotify.com/track/' + encodeURIComponent(song.sp) : 'https://open.spotify.com/search/' + q;
+    $('ytmusic').href = 'https://music.youtube.com/search?q=' + q;
+    $('apple').href = 'https://music.apple.com/search?term=' + q;
+    if (song.dz) {
+      $('deezer').href = 'https://www.deezer.com/track/' + encodeURIComponent(song.dz);
+      $('deezer').classList.remove('hidden');
+    }
+    if (song.preview) $('play').classList.remove('hidden');
+
+    // En Android abre la app y, si no está instalada, Google Play.
+    const isAndroid = /android/i.test(navigator.userAgent);
+    $('open').href = isAndroid
+      ? 'intent://song' + location.search + '#Intent;scheme=playhook;package=com.playhook.app;S.browser_fallback_url=' + encodeURIComponent(STORE) + ';end'
+      : STORE;
+    if (!isAndroid) $('open').textContent = 'Descargar PlayHook';
+  }
+
+  $('play').addEventListener('click', () => {
+    const audio = $('audio');
+    if (!audio.src) audio.src = song.preview;
+    if (audio.paused) { audio.play(); $('play').textContent = '■ Parar'; }
+    else { audio.pause(); $('play').textContent = '▶ Escuchar 30 s'; }
+  });
+  $('audio').addEventListener('ended', () => { $('play').textContent = '▶ Escuchar 30 s'; });
+
+  // Con el ID de Deezer completamos portada, título y fragmento (JSONP: la API no admite CORS).
+  window.onDeezer = (track) => {
+    if (track && !track.error) {
+      song.title = track.title || song.title;
+      song.artist = (track.artist && track.artist.name) || song.artist;
+      song.cover = track.album && (track.album.cover_xl || track.album.cover_big);
+      song.preview = track.preview;
+    }
+    render();
+  };
+  render();
+  if (song.dz && /^\d+$/.test(song.dz)) {
+    const s = document.createElement('script');
+    s.src = 'https://api.deezer.com/track/' + song.dz + '?output=jsonp&callback=onDeezer';
+    document.body.appendChild(s);
+  }
+</script>
+</body>
+</html>
