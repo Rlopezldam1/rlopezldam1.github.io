@@ -1,12 +1,17 @@
 [
   {
-    "relation": ["delegate_permission/common.handle_all_urls"],
+    "relation": [
+      "delegate_permission/common.handle_all_urls",
+      "delegate_permission/common.get_login_creds"
+    ],
     "target": {
       "namespace": "android_app",
       "package_name": "com.playhook.app",
       "sha256_cert_fingerprints": [
         "10:CE:FB:D5:47:DC:A2:0C:C2:FB:97:E9:6B:F1:0E:F7:AD:83:AC:44:D1:02:4D:85:5A:13:C9:D8:F0:11:FC:4D",
-        "04:11:B7:BE:9F:F5:C9:D3:23:48:32:06:AE:F5:C2:7E:EF:45:D4:1D:0E:D0:A7:25:F6:C1:CC:AF:9C:22:DB:E9"
+        "04:11:B7:BE:9F:F5:C9:D3:23:48:32:06:AE:F5:C2:7E:EF:45:D4:1D:0E:D0:A7:25:F6:C1:CC:AF:9C:22:DB:E9",
+        "8D:E0:D4:D0:4D:F7:94:5F:9E:D0:DF:66:BC:4A:6E:64:CC:22:14:31:3B:19:22:66:87:E3:35:95:08:B9:E9:E3",
+        "E9:C6:CC:F6:09:5F:44:F9:3A:62:F6:62:06:3F:16:87:6F:F0:12:64:1A:88:E3:B6:FB:88:96:A1:A9:A5:21:D6"
       ]
     }
   }
