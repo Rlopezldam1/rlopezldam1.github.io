@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.playhook.app",
+      "sha256_cert_fingerprints": [
+        "10:CE:FB:D5:47:DC:A2:0C:C2:FB:97:E9:6B:F1:0E:F7:AD:83:AC:44:D1:02:4D:85:5A:13:C9:D8:F0:11:FC:4D",
+        "04:11:B7:BE:9F:F5:C9:D3:23:48:32:06:AE:F5:C2:7E:EF:45:D4:1D:0E:D0:A7:25:F6:C1:CC:AF:9C:22:DB:E9"
+      ]
+    }
+  }
+]
